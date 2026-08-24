@@ -13,18 +13,22 @@
 
     <pre id="output"></pre>
 
+    <button id="send-location">Send Location</button>
+
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
     <script>
       const output = document.getElementById("output");
       const connectButton = document.getElementById("connect");
 
+      let socket;
+
       connectButton.addEventListener("click", () => {
         const token = prompt("Enter your MyAuth access token:");
 
         if (!token) return;
 
-        const socket = io("http://localhost:4000", {
+        socket = io("http://localhost:4000", {
           auth: {
             token,
           },
@@ -41,6 +45,21 @@
         socket.on("disconnect", (reason) => {
           output.textContent += `\nDisconnected: ${reason}`;
         });
+      });
+
+      const sendLocationButton = document.getElementById("send-location");
+
+      sendLocationButton.addEventListener("click", () => {
+        socket.emit(
+          "location:update",
+          {
+            latitude: 31.5204,
+            longitude: 74.3587,
+          },
+          (response) => {
+            console.log("Location response:", response);
+          },
+        );
       });
     </script>
   </body>

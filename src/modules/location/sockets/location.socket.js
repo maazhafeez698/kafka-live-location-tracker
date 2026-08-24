@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 
 import authenticateSocket from "./socket-auth.js";
+import { publishUserLocation } from "../services/location.service.js";
 
 const initializeLocationSocket = (httpServer) => {
   const io = new Server(httpServer, {
@@ -14,6 +15,28 @@ const initializeLocationSocket = (httpServer) => {
 
   io.on("connection", (socket) => {
     console.log(`User connected: ${socket.user.id}`);
+
+    socket.on("location:update", async (data, callback) => {
+      try {
+        const event = await publishUserLocation({
+          userId: socket.user.id,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        });
+
+        callback?.({
+          success: true,
+          event,
+        });
+      } catch (error) {
+        console.error("Location update failed:", error);
+
+        callback?.({
+          success: false,
+          message: error.message,
+        });
+      }
+    });
 
     socket.on("disconnect", () => {
       console.log(`User disconnected: ${socket.user.id}`);
