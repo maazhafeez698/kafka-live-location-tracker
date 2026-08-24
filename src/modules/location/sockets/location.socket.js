@@ -7,7 +7,7 @@ import startRealtimeConsumer from "../kafka/consumers/realtime.consumer.js";
 const initializeLocationSocket = async (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:5000",
+      origin: process.env.CLIENT_URL || "http://localhost:4000",
       credentials: true,
     },
   });
