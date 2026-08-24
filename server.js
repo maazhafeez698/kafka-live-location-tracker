@@ -14,7 +14,7 @@ const start = async () => {
 
   const httpServer = http.createServer(app);
 
-  initializeLocationSocket(httpServer);
+  await initializeLocationSocket(httpServer);
 
   httpServer.listen(PORT, () => {
     console.log(

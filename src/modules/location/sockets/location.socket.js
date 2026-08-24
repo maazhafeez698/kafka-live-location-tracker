@@ -2,8 +2,9 @@ import { Server } from "socket.io";
 
 import authenticateSocket from "./socket-auth.js";
 import { publishUserLocation } from "../services/location.service.js";
+import startRealtimeConsumer from "../kafka/consumers/realtime.consumer.js";
 
-const initializeLocationSocket = (httpServer) => {
+const initializeLocationSocket = async (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
       origin: process.env.CLIENT_URL || "http://localhost:5000",
@@ -42,6 +43,8 @@ const initializeLocationSocket = (httpServer) => {
       console.log(`User disconnected: ${socket.user.id}`);
     });
   });
+
+  await startRealtimeConsumer(io);
 
   return io;
 };

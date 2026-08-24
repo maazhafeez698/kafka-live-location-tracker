@@ -10,16 +10,16 @@
     <h1>Socket.IO Authentication Test</h1>
 
     <button id="connect">Connect</button>
+    <button id="send-location">Send Location</button>
 
     <pre id="output"></pre>
-
-    <button id="send-location">Send Location</button>
 
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 
     <script>
       const output = document.getElementById("output");
       const connectButton = document.getElementById("connect");
+      const sendLocationButton = document.getElementById("send-location");
 
       let socket;
 
@@ -45,11 +45,25 @@
         socket.on("disconnect", (reason) => {
           output.textContent += `\nDisconnected: ${reason}`;
         });
+
+        socket.on("server:location:update", (event) => {
+          console.log("Location broadcast received:", event);
+
+          output.textContent +=
+            `\n\nLocation update received:` +
+            `\nUser: ${event.userId}` +
+            `\nLatitude: ${event.latitude}` +
+            `\nLongitude: ${event.longitude}` +
+            `\nTimestamp: ${event.timestamp}`;
+        });
       });
 
-      const sendLocationButton = document.getElementById("send-location");
-
       sendLocationButton.addEventListener("click", () => {
+        if (!socket || !socket.connected) {
+          output.textContent += "\n\nConnect first.";
+          return;
+        }
+
         socket.emit(
           "location:update",
           {
