@@ -9,8 +9,6 @@ const startRealtimeConsumer = async (io) => {
     fromBeginning: false,
   });
 
-  console.log("Realtime Kafka consumer connected");
-
   await realtimeConsumer.run({
     eachMessage: async ({ message }) => {
       try {
@@ -18,10 +16,7 @@ const startRealtimeConsumer = async (io) => {
 
         io.emit("server:location:update", event);
 
-        console.log(`Location broadcasted for user: ${event.userId}`);
-      } catch (error) {
-        console.error("Failed to process realtime location event:", error);
-      }
+      } catch {}
     },
   });
 };

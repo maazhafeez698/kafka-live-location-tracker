@@ -21,22 +21,30 @@ const lastUpdate = document.getElementById("last-update");
 let socket = null;
 
 let currentUserId = null;
+
 let currentUserDisplayName = null;
 
 let locationTimer = null;
+
 let isSharingLocation = false;
+
 let locationRequestInProgress = false;
 
 let ownLocation = null;
+
 let hasCenteredOnOwnLocation = false;
 
-const LOCATION_INTERVAL_MS = 5000;
+const LOCATION_INTERVAL_MS = 10000;
 
 const markers = new Map();
 
+const PAKISTAN_CENTER = [30.3753, 69.3451];
+
+const DEFAULT_ZOOM = 5;
+
 const map = L.map("map", {
   zoomControl: false,
-}).setView([30.2, 71.5], 13);
+}).setView(PAKISTAN_CENTER, DEFAULT_ZOOM);
 
 L.control
   .zoom({
@@ -85,8 +93,11 @@ function createUserIcon(name, isSelf = false) {
 }
 
 function updatePeopleCount() {
-  peopleCount.textContent =
-    markers.size === 1 ? "1 person" : `${markers.size} people`;
+  const count = markers.size;
+
+  peopleCount.textContent = count === 1 ? "1 person" : `${count} people`;
+
+  lastUpdate.textContent = "Live";
 }
 
 function updateConnection(connected) {
@@ -119,6 +130,21 @@ function centerOnOwnLocation() {
   });
 }
 
+function resetLocationState() {
+  ownLocation = null;
+  hasCenteredOnOwnLocation = false;
+}
+
+function clearMarkers() {
+  for (const marker of markers.values()) {
+    map.removeLayer(marker);
+  }
+
+  markers.clear();
+
+  updatePeopleCount();
+}
+
 /* =========================
    SOCKET
    ========================= */
@@ -135,41 +161,41 @@ function connectToTracker(token) {
 
     connectButton.disabled = true;
     connectButton.textContent = "Connected";
+
     shareButton.disabled = false;
     centerButton.disabled = false;
 
     connectionText.textContent = "Live";
 
-    console.log("Connected:", socket.id);
+    updatePeopleCount();
   });
 
-  socket.on("connect_error", (error) => {
+  socket.on("connect_error", () => {
     updateConnection(false);
 
-    connectionStatus.textContent = error.message;
+    connectionText.textContent = "Connection failed";
 
     connectButton.disabled = false;
     connectButton.textContent = "Connect";
+
     shareButton.disabled = true;
+    stopButton.disabled = true;
     centerButton.disabled = true;
-
-    console.error("Socket connection failed:", error);
   });
 
-  socket.on("disconnect", (reason) => {
+  socket.on("disconnect", () => {
     updateConnection(false);
 
     connectButton.disabled = false;
     connectButton.textContent = "Connect";
+
     shareButton.disabled = true;
     stopButton.disabled = true;
     centerButton.disabled = true;
 
     stopLocationSharing();
 
-    lastUpdate.textContent = "Connection lost";
-
-    console.log("Disconnected:", reason);
+    lastUpdate.textContent = "Offline";
   });
 
   socket.on("server:session", (data) => {
@@ -188,10 +214,13 @@ function connectToTracker(token) {
 window.addEventListener("livetrack:authenticated", (event) => {
   const token = sessionStorage.getItem("liveTrackAccessToken");
 
-  if (token) {
-    currentUserName.textContent = formatUserName(event.detail?.name);
-    connectToTracker(token);
+  if (!token) {
+    return;
   }
+
+  currentUserName.textContent = formatUserName(event.detail?.name);
+
+  connectToTracker(token);
 });
 
 window.addEventListener("livetrack:logout", () => {
@@ -202,14 +231,24 @@ window.addEventListener("livetrack:logout", () => {
     socket = null;
   }
 
+  clearMarkers();
+  resetLocationState();
+
   currentUserId = null;
   currentUserDisplayName = null;
+
   currentUserName.textContent = "Not connected";
+
   connectButton.disabled = false;
   connectButton.textContent = "Connect";
+
   shareButton.disabled = true;
+  stopButton.disabled = true;
   centerButton.disabled = true;
+
   updateConnection(false);
+
+  lastUpdate.textContent = "Offline";
 });
 
 /* =========================
@@ -236,7 +275,7 @@ shareButton.addEventListener("click", () => {
   shareButton.disabled = true;
   stopButton.disabled = false;
 
-  lastUpdate.textContent = "Sharing location";
+  lastUpdate.textContent = "Live";
 
   requestLocation();
 });
@@ -270,22 +309,21 @@ function requestLocation() {
         },
         (response) => {
           if (!response?.success) {
-            console.warn("Location update rejected:", response.message);
-          } else {
-            lastUpdate.textContent = `Updated ${new Date().toLocaleTimeString()}`;
+            return;
           }
+
+          lastUpdate.textContent = "Live";
         },
       );
 
       scheduleNextLocation();
     },
 
-    (error) => {
+    () => {
       locationRequestInProgress = false;
 
-      console.log("Location unavailable, retrying:", error.message);
-
-      lastUpdate.textContent = "Location unavailable";
+      // Keep the footer stable.
+      lastUpdate.textContent = "Live";
 
       scheduleNextLocation();
     },
@@ -321,7 +359,6 @@ function stopLocationSharing() {
 
   if (locationTimer !== null) {
     clearTimeout(locationTimer);
-
     locationTimer = null;
   }
 
@@ -329,7 +366,7 @@ function stopLocationSharing() {
     shareButton.disabled = false;
     stopButton.disabled = true;
 
-    lastUpdate.textContent = "Location sharing stopped";
+    lastUpdate.textContent = "Live";
   }
 }
 
@@ -391,10 +428,11 @@ function handleLocationUpdate(event) {
     }
   }
 
+  // Keep the footer as:
+  // "1 person · Live"
+  // rather than exposing per-event details.
   if (timestamp && !isSelf) {
-    lastUpdate.textContent = `${displayName} moved · ${new Date(
-      timestamp,
-    ).toLocaleTimeString()}`;
+    lastUpdate.textContent = "Live";
   }
 }
 

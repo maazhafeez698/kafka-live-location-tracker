@@ -2,7 +2,6 @@ import * as authService from "./auth.service.js";
 import ApiResponse from "../../common/utils/api-response.js";
 
 const signup = async (req, res) => {
-  // console.log("SIGNUP CONTROLLER HIT");
   const user = await authService.signup(req.body);
   ApiResponse.created(
     res,
@@ -12,7 +11,6 @@ const signup = async (req, res) => {
 };
 
 const signin = async (req, res) => {
-  // console.log("LOGIN CONTROLLER HIT");
   const { user, accessToken, refreshToken } = await authService.signin(
     req.body,
   );
@@ -40,18 +38,32 @@ const logout = async (req, res) => {
 };
 
 const verifyEmail = async (req, res) => {
-  await authService.verifyEmail(req.params.token);
+  const redirectToClient = req.query.redirect === "1";
+  const clientUrl = process.env.CLIENT_URL || `${req.protocol}://${req.get("host")}`;
+
+  try {
+    await authService.verifyEmail(req.params.token);
+  } catch (error) {
+    if (redirectToClient) {
+      return res.redirect(`${clientUrl}/?verification=failed`);
+    }
+
+    throw error;
+  }
+
+  if (redirectToClient) {
+    return res.redirect(`${clientUrl}/?verification=success`);
+  }
+
   ApiResponse.ok(res, "Email verified successfully");
 };
 
 const forgotPassword = async (req, res) => {
-  // console.log("FORGOTPASS CONTROLLER HIT");
   await authService.forgotPassword(req.body.email);
   ApiResponse.ok(res, "Password reset email sent");
 };
 
 const resetPassword = async (req, res) => {
-  // console.log("RESETPASS CONTROLLER HIT");
   await authService.resetPassword(req.params.token, req.body.password);
   ApiResponse.ok(res, "Password reset successfully");
 };

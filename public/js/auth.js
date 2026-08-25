@@ -47,6 +47,23 @@ function showAuthMessage(message, type = "error") {
   authMessage.className = `auth-message ${type}`;
 }
 
+function handleVerificationResult() {
+  const verification = new URLSearchParams(window.location.search).get("verification");
+
+  if (!verification) return;
+
+  sessionStorage.removeItem("liveTrackAccessToken");
+  sessionStorage.removeItem("liveTrackUser");
+  setAuthMode(false);
+  showAuthMessage(
+    verification === "success"
+      ? "Email verified. You can now sign in."
+      : "Email verification failed. Please request a new verification email.",
+    verification === "success" ? "success" : "error",
+  );
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
 async function requestAuth(path, body) {
   const response = await fetch(`/api/auth/${path}`, {
     method: "POST",
@@ -149,4 +166,5 @@ async function restoreSession() {
   }
 }
 
+handleVerificationResult();
 restoreSession();

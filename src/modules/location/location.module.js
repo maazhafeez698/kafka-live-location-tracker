@@ -2,9 +2,11 @@ import initializeLocationSocket from "./sockets/location.socket.js";
 import startHistoryConsumer from "./kafka/consumers/history.consumer.js";
 
 const initializeLocationModule = async (httpServer) => {
-  const io = await initializeLocationSocket(httpServer);
+  const io = initializeLocationSocket(httpServer);
 
-  await startHistoryConsumer();
+  startHistoryConsumer().catch((error) => {
+    console.error("History Kafka consumer failed:", error);
+  });
 
   return io;
 };

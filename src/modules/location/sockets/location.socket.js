@@ -18,8 +18,6 @@ const initializeLocationSocket = async (httpServer) => {
   io.use(authenticateSocket);
 
   io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.user.id}`);
-
     socket.emit("server:session", {
       user: {
         id: socket.user.id,
@@ -35,11 +33,6 @@ const initializeLocationSocket = async (httpServer) => {
         if (lastUpdate && now - lastUpdate < LOCATION_RATE_LIMIT_MS) {
           const elapsed = now - lastUpdate;
 
-          console.log(
-            `Location rate-limited for user ${socket.user.id}. ` +
-              `Only ${elapsed}ms since last update.`,
-          );
-
           callback?.({
             success: false,
             message: "Location updates are too frequent",
@@ -50,8 +43,6 @@ const initializeLocationSocket = async (httpServer) => {
         }
 
         lastLocationUpdate.set(socket.id, now);
-
-        console.log(`Location accepted for user ${socket.user.id}`);
 
         const event = await publishUserLocation({
           userId: socket.user.id,
@@ -65,8 +56,6 @@ const initializeLocationSocket = async (httpServer) => {
           event,
         });
       } catch (error) {
-        console.error("Location update failed:", error);
-
         callback?.({
           success: false,
           message: error.message,
@@ -76,12 +65,12 @@ const initializeLocationSocket = async (httpServer) => {
 
     socket.on("disconnect", () => {
       lastLocationUpdate.delete(socket.id);
-
-      console.log(`User disconnected: ${socket.user.id}`);
     });
   });
 
-  await startRealtimeConsumer(io);
+  startRealtimeConsumer(io).catch((error) => {
+    console.error("Realtime Kafka consumer failed:", error);
+  });
 
   return io;
 };

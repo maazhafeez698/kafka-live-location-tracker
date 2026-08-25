@@ -11,8 +11,6 @@ const startHistoryConsumer = async () => {
     fromBeginning: true,
   });
 
-  console.log("Location history Kafka consumer connected");
-
   await historyConsumer.run({
     eachMessage: async ({ message }) => {
       try {
@@ -29,10 +27,7 @@ const startHistoryConsumer = async () => {
           timestamp: event.timestamp,
         });
 
-        console.log(`Location history saved for user: ${event.userId}`);
-      } catch (error) {
-        console.error("Failed to persist location event:", error);
-      }
+      } catch {}
     },
   });
 };

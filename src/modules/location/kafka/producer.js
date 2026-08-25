@@ -10,7 +10,6 @@ const connectProducer = async () => {
 
   isConnected = true;
 
-  console.log("Kafka producer connected");
 };
 
 const publishLocationUpdate = async (event) => {

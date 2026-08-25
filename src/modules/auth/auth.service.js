@@ -35,9 +35,7 @@ const signup = async ({ name, email, password, role }) => {
   // User can request a resend verification email later.
   try {
     await sendVerificationEmail(email, rawToken);
-  } catch (error) {
-    console.error("Failed to send verification email:", error.message);
-  }
+  } catch {}
 
   // Remove sensitive fields before returning user data.
   const userObj = user.toObject();
@@ -199,9 +197,7 @@ const forgotPassword = async (email) => {
   // Email failure should not crash the request.
   try {
     await sendResetPasswordEmail(email, rawToken);
-  } catch (error) {
-    console.error("Failed to send reset email:", error.message);
-  }
+  } catch {}
 };
 
 const resetPassword = async (token, newPassword) => {
