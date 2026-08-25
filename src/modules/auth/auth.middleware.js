@@ -17,9 +17,9 @@ const authenticate = async (req, res, next) => {
 
   req.user = {
     id: user._id,
-    role: user.role,
     name: user.name,
     email: user.email,
+    ...(user.role !== undefined && { role: user.role }),
   };
 
   next();

@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { required } from "joi";
 
 const userSchema = mongoose.Schema(
   {
@@ -27,8 +28,7 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["customer", "seller", "admin", "support"],
-      default: "customer",
+      enum: ["admin", "manager", "viewer"],
     },
     isVerified: {
       type: Boolean,

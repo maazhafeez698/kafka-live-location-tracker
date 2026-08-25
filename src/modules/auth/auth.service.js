@@ -27,7 +27,7 @@ const signup = async ({ name, email, password, role }) => {
     name,
     email,
     password,
-    role,
+    ...(role && { role }),
     verificationToken: hashedToken,
   });
 
@@ -70,8 +70,7 @@ const signin = async ({ email, password }) => {
 
   // Generate short-lived access token and long-lived refresh token.
   const accessToken = generateAccessToken({
-    id: user._id,
-    role: user.role,
+    id: user._id
   });
 
   const refreshToken = generateRefreshToken({
@@ -121,7 +120,6 @@ const refreshToken = async (token) => {
   // Generate a new access token after successful verification.
   const accessToken = generateAccessToken({
     id: user._id,
-    role: user.role,
   });
 
   return {
