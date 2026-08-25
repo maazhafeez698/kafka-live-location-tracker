@@ -16,11 +16,20 @@ const validateCoordinates = (latitude, longitude) => {
   }
 };
 
-const publishUserLocation = async ({ userId, latitude, longitude }) => {
-  validateCoordinates(latitude, longitude);
+const publishUserLocation = async ({
+  userId,
+  username,
+  latitude,
+  longitude,
+}) => {
+  validateCoordinates(
+    latitude,
+    longitude,
+  );
 
   const event = createLocationUpdateEvent({
     userId,
+    username,
     latitude,
     longitude,
     timestamp: new Date().toISOString(),
@@ -31,4 +40,4 @@ const publishUserLocation = async ({ userId, latitude, longitude }) => {
   return event;
 };
 
-export { publishUserLocation };
+export { validateCoordinates, publishUserLocation };

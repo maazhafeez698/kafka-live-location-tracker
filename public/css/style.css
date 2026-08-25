@@ -1,0 +1,439 @@
+:root {
+  --text: #17181c;
+  --muted: #73767f;
+
+  --accent: #635bff;
+  --accent-hover: #544cf0;
+
+  --success: #2e9d62;
+  --danger: #c35d6e;
+
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-hover: rgba(255, 255, 255, 0.96);
+
+  --border: rgba(23, 24, 28, 0.08);
+
+  --shadow: 0 10px 30px rgba(23, 24, 28, 0.1);
+
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-pill: 999px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+
+  color: var(--text);
+  background: #eef0f3;
+}
+
+button {
+  font: inherit;
+}
+
+.app {
+  position: relative;
+
+  width: 100%;
+  height: 100dvh;
+
+  overflow: hidden;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================
+   NAVBAR
+   ========================= */
+
+.navbar {
+  position: absolute;
+
+  top: 16px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  z-index: 1000;
+
+  width: min(920px, calc(100vw - 32px));
+
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 9px 10px 9px 12px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  background: var(--surface);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Navbar left ---------- */
+
+.navbar-left {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  border-radius: 10px;
+
+  background: var(--text);
+  color: white;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.brand {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.brand-name {
+  font-size: 14px;
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+.brand-user {
+  max-width: 150px;
+
+  font-size: 10px;
+  color: var(--muted);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Navbar right ---------- */
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.connection-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 7px 10px;
+
+  border-radius: var(--radius-pill);
+
+  color: var(--muted);
+
+  font-size: 10px;
+  font-weight: 600;
+
+  background: rgba(245, 246, 248, 0.9);
+
+  white-space: nowrap;
+}
+
+#status-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #a7aab1;
+}
+
+.nav-button {
+  height: 34px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  padding: 0 13px;
+
+  cursor: pointer;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.nav-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.nav-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.primary-button {
+  color: white;
+
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.secondary-button {
+  color: var(--danger);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.icon-button {
+  width: 34px;
+  padding: 0;
+
+  font-size: 18px;
+
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* =========================
+   BOTTOM PILL
+   ========================= */
+
+.bottom-pill {
+  position: absolute;
+
+  left: 50%;
+  bottom: 16px;
+
+  transform: translateX(-50%);
+
+  z-index: 1000;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 10px;
+
+  max-width: calc(100vw - 32px);
+
+  padding: 9px 13px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+
+  background: var(--surface);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow: var(--shadow);
+
+  color: var(--muted);
+
+  font-size: 10px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.bottom-separator {
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: #c3c5ca;
+}
+
+/* =========================
+   USER MARKERS
+   ========================= */
+
+.user-marker-wrapper {
+  background: transparent;
+  border: 0;
+}
+
+.user-marker {
+  display: grid;
+  place-items: center;
+
+  width: 30px;
+  height: 30px;
+
+  border: 3px solid white;
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #756ef7, #5048dc);
+
+  color: white;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  box-shadow: 0 5px 14px rgba(80, 72, 220, 0.32);
+}
+
+.user-marker.self {
+  width: 34px;
+  height: 34px;
+
+  background: var(--text);
+
+  box-shadow:
+    0 0 0 5px rgba(99, 91, 255, 0.16),
+    0 6px 16px rgba(23, 24, 28, 0.22);
+}
+
+.leaflet-tooltip.user-label {
+  border: 0;
+
+  padding: 4px 7px;
+
+  border-radius: 7px;
+
+  background: rgba(255, 255, 255, 0.94);
+
+  color: var(--text);
+
+  box-shadow: 0 4px 12px rgba(23, 24, 28, 0.1);
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.leaflet-tooltip.user-label::before {
+  display: none;
+}
+
+/* =========================
+   LEAFLET CONTROLS
+   ========================= */
+
+.leaflet-control-zoom {
+  border: 0 !important;
+  box-shadow: var(--shadow);
+}
+
+.leaflet-control-zoom a {
+  border: 0 !important;
+
+  background: rgba(255, 255, 255, 0.92) !important;
+
+  color: var(--text) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.75) !important;
+
+  border-top-left-radius: 8px;
+
+  font-size: 9px;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 760px) {
+  .navbar {
+    width: calc(100vw - 20px);
+
+    top: 10px;
+
+    padding: 8px;
+  }
+
+  .navbar-right {
+    gap: 5px;
+  }
+
+  .connection-status {
+    display: none;
+  }
+
+  .brand-user {
+    max-width: 100px;
+  }
+
+  .nav-button {
+    padding: 0 10px;
+  }
+
+  .bottom-pill {
+    bottom: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .brand-name {
+    font-size: 13px;
+  }
+
+  .brand-user {
+    display: none;
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-button {
+    height: 32px;
+  }
+
+  .icon-button {
+    width: 32px;
+  }
+}

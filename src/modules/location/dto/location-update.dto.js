@@ -1,5 +1,6 @@
 const createLocationUpdateEvent = ({
   userId,
+  username,
   latitude,
   longitude,
   timestamp,
@@ -7,6 +8,7 @@ const createLocationUpdateEvent = ({
   return {
     eventType: "location.updated",
     userId,
+    username,
     latitude,
     longitude,
     timestamp,
