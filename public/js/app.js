@@ -123,13 +123,7 @@ function centerOnOwnLocation() {
    SOCKET
    ========================= */
 
-connectButton.addEventListener("click", () => {
-  const token = prompt("Enter your MyAuth access token:");
-
-  if (!token) {
-    return;
-  }
-
+function connectToTracker(token) {
   socket = io({
     auth: {
       token,
@@ -140,6 +134,7 @@ connectButton.addEventListener("click", () => {
     updateConnection(true);
 
     connectButton.disabled = true;
+    connectButton.textContent = "Connected";
     shareButton.disabled = false;
     centerButton.disabled = false;
 
@@ -154,6 +149,7 @@ connectButton.addEventListener("click", () => {
     connectionStatus.textContent = error.message;
 
     connectButton.disabled = false;
+    connectButton.textContent = "Connect";
     shareButton.disabled = true;
     centerButton.disabled = true;
 
@@ -164,6 +160,7 @@ connectButton.addEventListener("click", () => {
     updateConnection(false);
 
     connectButton.disabled = false;
+    connectButton.textContent = "Connect";
     shareButton.disabled = true;
     stopButton.disabled = true;
     centerButton.disabled = true;
@@ -186,6 +183,33 @@ connectButton.addEventListener("click", () => {
   socket.on("server:location:update", (event) => {
     handleLocationUpdate(event);
   });
+}
+
+window.addEventListener("livetrack:authenticated", (event) => {
+  const token = sessionStorage.getItem("liveTrackAccessToken");
+
+  if (token) {
+    currentUserName.textContent = formatUserName(event.detail?.name);
+    connectToTracker(token);
+  }
+});
+
+window.addEventListener("livetrack:logout", () => {
+  stopLocationSharing();
+
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+
+  currentUserId = null;
+  currentUserDisplayName = null;
+  currentUserName.textContent = "Not connected";
+  connectButton.disabled = false;
+  connectButton.textContent = "Connect";
+  shareButton.disabled = true;
+  centerButton.disabled = true;
+  updateConnection(false);
 });
 
 /* =========================

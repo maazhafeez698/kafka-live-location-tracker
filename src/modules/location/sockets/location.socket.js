@@ -30,7 +30,7 @@ const initializeLocationSocket = async (httpServer) => {
     socket.on("location:update", async (data, callback) => {
       try {
         const now = Date.now();
-        const lastUpdate = lastLocationUpdate.get(socket.user.id);
+        const lastUpdate = lastLocationUpdate.get(socket.id);
 
         if (lastUpdate && now - lastUpdate < LOCATION_RATE_LIMIT_MS) {
           const elapsed = now - lastUpdate;
@@ -43,12 +43,13 @@ const initializeLocationSocket = async (httpServer) => {
           callback?.({
             success: false,
             message: "Location updates are too frequent",
+            retryAfterMs: LOCATION_RATE_LIMIT_MS - elapsed,
           });
 
           return;
         }
 
-        lastLocationUpdate.set(socket.user.id, now);
+        lastLocationUpdate.set(socket.id, now);
 
         console.log(`Location accepted for user ${socket.user.id}`);
 
@@ -74,7 +75,7 @@ const initializeLocationSocket = async (httpServer) => {
     });
 
     socket.on("disconnect", () => {
-      lastLocationUpdate.delete(socket.user.id);
+      lastLocationUpdate.delete(socket.id);
 
       console.log(`User disconnected: ${socket.user.id}`);
     });
