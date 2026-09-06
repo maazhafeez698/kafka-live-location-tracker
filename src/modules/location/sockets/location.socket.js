@@ -5,7 +5,7 @@ import { publishUserLocation } from "../services/location.service.js";
 import startRealtimeConsumer from "../kafka/consumers/realtime.consumer.js";
 
 const lastLocationUpdate = new Map();
-const LOCATION_RATE_LIMIT_MS = 3000;
+const LOCATION_RATE_LIMIT_MS = 10000;
 
 const initializeLocationSocket = async (httpServer) => {
   const io = new Server(httpServer, {

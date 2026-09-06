@@ -14,12 +14,14 @@ This is a modular monolith for learning and exploration. Kafka is the event boun
 - Browser Geolocation API with explicit Share and Stop controls
 - Location updates every 10 seconds while sharing
 - Latitude and longitude validation before publishing
-- Three-second per-socket in-memory rate limit
+- Three-second per-user in-memory rate limit
 - Kafka topic for location events, keyed by user ID
 - Independent realtime and history Kafka consumer groups
 - Live Leaflet markers with user names and a distinct current-user marker
 - MongoDB location history records
 - Local MongoDB and Kafka infrastructure through Docker Compose
+
+Note: For authentication used [my-auth-js](https://github.com/maazhafeez698/my-auth-js)
 
 ## Purpose and Scope
 
@@ -53,7 +55,7 @@ It intentionally does not attempt to be a production tracking platform. It has n
 flowchart TD
     U[Authenticated browser] -->|Socket.IO + access token| S[Socket.IO server]
     S --> A[Socket authentication]
-    A --> L[3-second rate limit]
+    A --> L[10-second rate limit]
     L --> V[Coordinate validation]
     V --> P[Kafka producer]
     P --> T[(location-updates topic)]
@@ -103,22 +105,67 @@ sequenceDiagram
 ## Project Structure
 
 ```text
-src/
-├── common/                 # Database, Kafka, email, JWT, API utilities
-├── modules/
-│   ├── auth/               # Registration, verification, login, reset, logout
-│   └── location/
-│       ├── dto/            # Location event shape
-│       ├── kafka/          # Producer, topic, clients, consumers
-│       ├── models/         # MongoDB location history model
-│       ├── services/       # Coordinate validation and event publishing
-│       └── sockets/        # Socket.IO auth and location events
-├── app.js                  # Express application and routes
-└── server.js               # Database, HTTP, Socket.IO, and module startup
-public/
-├── index.html              # Integrated auth and tracker UI
-├── css/                    # UI styles
-└── js/                     # Auth and map/socket client code
+kafka-live-location-tracker/
+│
+├── src/
+│   ├── common/
+│   │   ├── config/
+│   │   │   ├── db.js
+│   │   │   └── kafka.js
+│   │   │
+│   │   └── utils/
+│   │       └── api-error.js
+│   │
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── auth.controller.js
+│   │   │   ├── auth.routes.js
+│   │   │   ├── auth.service.js
+│   │   │   └── ...
+│   │   │
+│   │   └── location/
+│   │       ├── dto/
+│   │       │   └── location-update.dto.js
+│   │       │
+│   │       ├── kafka/
+│   │       │   ├── consumers/
+│   │       │   │   ├── realtime.consumer.js
+│   │       │   │   └── history.consumer.js
+│   │       │   │
+│   │       │   ├── kafka.client.js
+│   │       │   ├── producer.js
+│   │       │   └── topic.js
+│   │       │
+│   │       ├── models/
+│   │       │   └── location-history.model.js
+│   │       │
+│   │       ├── services/
+│   │       │   └── location.service.js
+│   │       │
+│   │       └── sockets/
+│   │           ├── location.socket.js
+│   │           └── socket-auth.js
+│   │
+│   └── app.js
+│   
+├── public/
+│   │
+│   ├── css/
+│   │   └── style.css
+│   │
+│   ├── js/
+│   │   ├── app.js
+│   │   └── auth.js
+│   │
+│   └─── index.html
+│
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── server.js
+└── README.md
 ```
 
 ## Run Locally
@@ -181,11 +228,8 @@ Base URL: `http://localhost:4000/api/auth`
 | POST | `/signup` | Public | Create an unverified account and send verification email |
 | GET | `/verify-email/:token` | Public | Verify an email token; email links redirect back to the UI |
 | POST | `/signin` | Public | Sign in after email verification |
-| POST | `/refresh-token` | Public | Issue a new access token from the refresh cookie |
 | POST | `/logout` | Access token | Clear the refresh token |
 | GET | `/me` | Access token | Return the current user |
-| POST | `/forgot-password` | Public | Send a password reset email |
-| PUT | `/reset-password/:token` | Public | Set a new password |
 
 Protected requests use:
 
@@ -248,7 +292,7 @@ flowchart LR
     H --> D[MongoDB history]
 ```
 
-That producer/topic/consumer-group pattern is the central Kafka concept demonstrated by the project.
+That producer/topic/consumer-group pattern is the central Kafka concept demonstrated by the project. Kafka is used as the event stream and processing boundary; MongoDB remains the application's persistent location-history store.
 
 ## License
 
