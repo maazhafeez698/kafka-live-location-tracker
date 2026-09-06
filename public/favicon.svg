@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Location pin with live tracking dot -->
+  <defs>
+    <style>
+      .pin-body { fill: #C5D66B; }
+      .pin-dot { fill: #ffffff; }
+      .live-pulse { animation: pulse 2s infinite; }
+      @keyframes pulse {
+        0%, 100% { r: 6; opacity: 1; }
+        50% { r: 8; opacity: 0.6; }
+      }
+    </style>
+  </defs>
+  
+  <!-- Main location pin -->
+  <path class="pin-body" d="M32 8 C 22 8, 14 16, 14 26 C 14 36, 32 56, 32 56 C 32 56, 50 36, 50 26 C 50 16, 42 8, 32 8" />
+  
+  <!-- Pulsing dot in center (live tracking indicator) -->
+  <circle class="pin-dot live-pulse" cx="32" cy="26" r="6" />
+  
+  <!-- Inner ring -->
+  <circle class="pin-dot" cx="32" cy="26" r="3" />
+</svg>

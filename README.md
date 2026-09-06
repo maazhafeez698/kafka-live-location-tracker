@@ -21,8 +21,6 @@ This is a modular monolith for learning and exploration. Kafka is the event boun
 - MongoDB location history records
 - Local MongoDB and Kafka infrastructure through Docker Compose
 
-Note: For authentication used [my-auth-js](https://github.com/maazhafeez698/my-auth-js)
-
 ## Purpose and Scope
 
 The project demonstrates:
@@ -55,7 +53,7 @@ It intentionally does not attempt to be a production tracking platform. It has n
 flowchart TD
     U[Authenticated browser] -->|Socket.IO + access token| S[Socket.IO server]
     S --> A[Socket authentication]
-    A --> L[10-second rate limit]
+    A --> L[5-seconds rate limit]
     L --> V[Coordinate validation]
     V --> P[Kafka producer]
     P --> T[(location-updates topic)]
@@ -239,6 +237,8 @@ Authorization: Bearer <accessToken>
 
 The integrated UI stores the access token in session storage and sends it when opening the Socket.IO connection. Signup and signin requests are handled by the same frontend screen as the tracker.
 
+Note: For authentication i used [my-auth-js](https://github.com/maazhafeez698/my-auth-js)
+
 ## Location Behavior
 
 1. The map starts centered on Pakistan.
@@ -252,11 +252,7 @@ The integrated UI stores the access token in session storage and sends it when o
 
 ## Testing and Verification
 
-There is no automated test suite configured in `package.json`. The available Kafka smoke script is:
-
-```bash
-npm run test:kafka
-```
+There is no automated test suite configured in `package.json`. 
 
 For a manual check:
 
